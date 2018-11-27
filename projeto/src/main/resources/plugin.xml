@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension point="com.change_vision.astah.ui.actionSets">
+      <actionSet
+            label="%action_set_label"
+            visible="true"
+            id="projeto01.projeto.actionSet">
+         <menu
+               id="projeto"
+               label="%menu_group"
+               path="tool/projeto">
+         </menu>
+         <action
+        label="%count_classes" 
+        class="projeto.TemplateAction"
+        tooltip="Count classes" 
+        menubarPath="tool/projeto/"
+        id="projeto.TemplateAction">
+      </action>
+      
+         <action
+        label="%valida" 
+        class="projeto.ValidaAction"
+        tooltip="valida classes" 
+        menubarPath="tool/projeto/"
+        id="projeto.ValidaAction">
+      </action>
+      
+     </actionSet>
+   </extension>
+   <extension point="com.change_vision.astah.ui.view">
+        <view
+            id="ui.HelloWorldView"
+            type="extraTab"
+            class="ui.HelloWorldView" />
+   </extension>
+</plugin>

@@ -1,0 +1,63 @@
+id_Fork= {1,2} 
+channel fork_right : id_Fork.operation 
+channel fork_left : id_Fork.operation 
+channel x : operation
+id_PHIL= {1,2} 
+channel phil_right : id_PHIL.operation 
+channel phil_left : id_PHIL.operation
+fork2 = Fork(1)
+phil2 = PHIL(2)
+phil1 = PHIL(3)
+fork1 = Fork(4)
+ProcessInterleave = fork2|||phil2|||phil1|||fork1
+processcomp= (ProcessInterleave) [|{| fork_left.1,phil_left.2|}|]Buffer
+processcomp_comp= (processcomp) [|{| fork_right.4,phil_left.3|}|]Buffer
+processcomp_comp_comp= (processcomp_comp) [|{| phil_right.3,fork_right.1|}|]Buffer
+processcomp_comp_comp_comp= (processcomp_comp_comp) [|{| fork_left.4,phil_right.2|}|]Buffer
+
+input_phil2= {|phil_right.2.op, phil_left.2.op|op:PHIL_O|}
+input_fork1= {|fork_left.4.op, fork_right.4.op|op:Fork_I|}
+input_phil1= {|phil_right.3.op, phil_left.3.op|op:PHIL_O|}
+input_fork2= {|fork_left.1.op, fork_right.1.op|op:Fork_I|}
+
+output_phil2= {|phil_right.2.op, phil_left.2.op|op:PHIL_I|}
+output_fork1= {|fork_left.4.op, fork_right.4.op|op:Fork_O|}
+output_phil1= {|phil_right.3.op, phil_left.3.op|op:PHIL_I|}
+output_fork2= {|fork_left.1.op, fork_right.1.op|op:Fork_O|}
+
+datatype operation = picksup_I | picksup_O | putsdown_I | putsdown_O
+subtype Fork_I = picksup_I | putsdown_I
+subtype PHIL_I = picksup_I | putsdown_I
+
+subtype Fork_O = picksup_O | putsdown_O
+subtype PHIL_O = picksup_O | putsdown_O
+
+Fork(id) = STM_FORK(id)
+
+STM_FORK(id) = available(id)
+Busy1(id) =  fork_right.id.putsdown_I -> fork_right.id.putsdown_O ->available(id)
+Busy2(id) =  fork_left.id.putsdown_I -> fork_left.id.putsdown_O ->available(id)
+available(id) =  fork_left.id.picksup_I -> fork_left.id.picksup_O ->Busy2(id)[]
+ fork_right.id.picksup_I -> fork_right.id.picksup_O ->Busy1(id)
+
+STM_PHIL(id) = HoldingForkR(id)
+PutsDownR(id) =  phil_right.id.putsdown_I -> phil_right.id.putsdown_O ->PutsDownL(id)
+HoldingForkR(id) =  phil_right.id.picksup_I -> phil_right.id.picksup_O ->HoldingForkL(id)
+PutsDownL(id) =  phil_left.id.putsdown_I -> phil_left.id.putsdown_O ->HoldingForkR(id)
+HoldingForkL(id) =  phil_left.id.picksup_I -> phil_left.id.picksup_O ->PutsDownR(id)
+
+
+PHIL(id) = STM_PHIL(id)
+
+channel a 
+Buffer = a -> SKIP
+
+
+
+----Gerar protocolo--------------------
+
+protocolo1 = fork2 [[fork_right.1 <- x , fork_left.1 <- x ]]
+--[[port_ctr_cell.1 <- comm]]
+
+
+
